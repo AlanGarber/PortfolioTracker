@@ -6,41 +6,126 @@ export const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: colors.background 
   },
+  listContent: { 
+    padding: 20,
+    paddingTop: 10,
+  },
+  centerLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  headerContainer: {
+    marginBottom: 20,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerTitle: { 
+    fontSize: 28, 
+    fontWeight: '800', 
+    color: colors.text.primary,
+    letterSpacing: -0.5,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
   header: { 
     paddingHorizontal: 20,
     paddingBottom: 20, 
     paddingTop: 10,
-    backgroundColor: colors.background, 
+    backgroundColor: colors.background,
+    alignItems: 'center',
   },
   title: { 
-    fontSize: 32, 
+    fontSize: 34, 
     fontWeight: '800', 
     color: colors.text.primary,
     letterSpacing: -0.5
   },
-  listContent: { 
-    padding: 16 
+
+  avatarPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  avatarText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: colors.text.secondary,
+  },
+
+  summaryCard: {
+    backgroundColor: colors.card,
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 4,
+    alignItems: 'center',
+  },
+  summaryLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  summaryBalance: {
+    fontSize: 38,
+    fontWeight: '900',
+    color: colors.text.primary,
+    marginBottom: 8,
+    letterSpacing: -1,
+  },
+  pnlContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  pnlText: { fontSize: 17, fontWeight: '600' },
+  pnlBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+  pnlPercentage: { fontSize: 13, fontWeight: '700' },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text.primary,
+    marginBottom: 10,
+  },
+
+  // --- FAB ---
   fab: {
     position: 'absolute',
     bottom: 30,
     right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 56, // Estándar Material Design
+    height: 56,
+    borderRadius: 28,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: "#000",
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.30,
-    shadowRadius: 4.65,
-    elevation: 8,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   fabText: {
-    fontSize: 32,
+    fontSize: 30,
     color: '#fff',
-    marginTop: -4, 
+    marginTop: -4,
     fontWeight: '300'
   }
 });
