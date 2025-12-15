@@ -1,8 +1,12 @@
-const CURRENCY_CONFIG: Record<string, { symbol: string; prefix: boolean }> = {
-  USD: { symbol: 'US$', prefix: true },
-  ARS: { symbol: 'AR$', prefix: true },
-  EUR: { symbol: 'EU€', prefix: true },
-  DEFAULT: { symbol: '$', prefix: true }
+const CURRENCY_CONFIG: Record<string, { symbol: string; prefix: boolean; flag: string }> = {
+  USD: { symbol: 'US$', prefix: true, flag: '🇺🇸' },
+  ARS: { symbol: 'AR$', prefix: true, flag: '🇦🇷' },
+  EUR: { symbol: 'EU€', prefix: true, flag: '🇪🇺' },
+  DEFAULT: { symbol: '$', prefix: true, flag: '🏳️' }
+};
+
+export const getCurrencyFlag = (currency: string) => {
+  return (CURRENCY_CONFIG[currency] || CURRENCY_CONFIG.DEFAULT).flag;
 };
 
 export const formatCurrency = (value: number, currency: string = 'USD') => {

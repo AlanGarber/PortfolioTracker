@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Asset } from '../../types';
 import { calculateAssetPerformance } from '../../utils/finance';
-import { formatCurrency, formatPercentage } from '../../utils/format';
+import { formatCurrency, formatPercentage, getCurrencyFlag } from '../../utils/format';
 import { colors } from '../../theme/colors';
 
 interface AssetCardProps {
@@ -29,7 +29,7 @@ export const AssetCard = ({ asset, onPress }: AssetCardProps) => {
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <Text style={styles.price}>
-            {formatCurrency(asset.currentPrice, asset.currency)}
+            {getCurrencyFlag(asset.currency)} {formatCurrency(asset.currentPrice, asset.currency)}
           </Text>
           <Text style={[styles.pnl, { color: pnlColor }]}>
             {formatCurrency(stats.unrealizedPL, asset.currency)} ({formatPercentage(stats.unrealizedPLPercentage)})

@@ -1,11 +1,13 @@
 const GOOGLE_SHEET_CSV_URL = process.env.EXPO_PUBLIC_GOOGLE_SHEET_CSV_URL;
 
-export interface Asset {
+export interface MarketAsset {
   ticker: string;
   price: number;
+  currency: string;
+  name: string;
 }
 
-export const fetchLivePrices = async (): Promise<Asset[]> => {
+export const fetchLivePrices = async (): Promise<MarketAsset[]> => {
     if (!GOOGLE_SHEET_CSV_URL) return [];
   
     try {
@@ -28,7 +30,7 @@ export const fetchLivePrices = async (): Promise<Asset[]> => {
   }
 };
 
-const parseCSV = (csvText: string): Asset[] => {
+const parseCSV = (csvText: string): MarketAsset[] => {
   const lines = csvText.split('\n');
   
   return lines.map(line => {
@@ -36,12 +38,19 @@ const parseCSV = (csvText: string): Asset[] => {
 
     const ticker = parts[0]?.trim();
     const priceString = parts[1]?.trim();
+    const currency = parts[2]?.trim().toUpperCase();
+    const name = parts[3]?.trim();
 
     if (!ticker || !priceString) return null;
 
     const price = parseFloat(priceString);
     if (isNaN(price)) return null; 
 
-    return { ticker, price };
-  }).filter(item => item !== null) as Asset[];
+    return { 
+      ticker, 
+      price, 
+      currency: currency || 'USD',
+      name: name || ticker 
+    };
+  }).filter(item => item !== null) as MarketAsset[];
 };

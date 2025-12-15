@@ -4,11 +4,14 @@ import { Asset, Transaction } from '../types';
 import { supabase } from '../services/supabase';
 import { groupTransactionsByAsset } from '../utils/transform';
 import { calculateAssetPerformance } from '../utils/finance';
-import { fetchLivePrices } from '../services/prices';
+import { MarketAsset, fetchLivePrices } from '../services/prices';
+import { fetchDollarRate } from '../services/dolar';
 
 interface PortfolioContextType {
   assets: Asset[];
+  availableAssets: MarketAsset[];
   loading: boolean;
+  exchangeRate: number;
   addTransaction: (tx: Omit<Transaction, 'id'> & { ticker: string }) => Promise<void>;
   refreshData: () => Promise<void>;
 }
@@ -17,14 +20,17 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 
 export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [availableAssets, setAvailableAssets] = useState<MarketAsset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [exchangeRate, setExchangeRate] = useState<number>(0);
 
   const fetchPortfolio = async () => {
     try {
       setLoading(true);
-      const [transactionsResponse, livePrices] = await Promise.all([
+      const [transactionsResponse, marketData, dollarRate] = await Promise.all([
         supabase.from('transactions').select('*').order('date', { ascending: false }),
-        fetchLivePrices()
+        fetchLivePrices(),
+        fetchDollarRate()
       ]);
 
       const { data, error } = transactionsResponse;
@@ -32,24 +38,28 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       if (data) {
+
+
+        const marketMap = marketData.reduce((acc, item) => {
+          acc[item.ticker] = item;
+          return acc;
+        }, {} as Record<string, MarketAsset>);
+
         const groupedAssets = groupTransactionsByAsset(data);
 
-        const pricesMap = livePrices.reduce((acc, item) => {
-          acc[item.ticker] = item.price;
-          return acc;
-        }, {} as Record<string, number>);
-
-        const assetsWithLivePrices = groupedAssets.map(asset => {
-
-          const ticker = asset.ticker;
-          const livePrice = pricesMap[ticker];
+        const enrichedAssets = groupedAssets.map(asset => {
+          const marketInfo = marketMap[asset.ticker];
           return {
             ...asset,
-            currentPrice: livePrice || asset.currentPrice
+            currentPrice: marketInfo ? marketInfo.price : asset.currentPrice,
+            currency: marketInfo ? marketInfo.currency : asset.currency,
+            name: marketInfo ? marketInfo.name : asset.name
           };
         });
 
-        setAssets(assetsWithLivePrices);
+        setExchangeRate(dollarRate);
+        setAvailableAssets(marketData);
+        setAssets(enrichedAssets);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -66,12 +76,12 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   const addTransaction = async (newTx: Omit<Transaction, 'id'> & { ticker: string }) => {
 
     if (newTx.type === 'SELL') {
-      const asset = assets.find(a => a.ticker === newTx.ticker);
-      if (!asset) {
+      const availableAsset = assets.find(a => a.ticker === newTx.ticker);
+      if (!availableAsset) {
         Alert.alert("Error", "No tienes este activo.");
         return;
       }
-      const stats = calculateAssetPerformance(asset);
+      const stats = calculateAssetPerformance(availableAsset);
       if (newTx.quantity > stats.totalQuantity) {
         Alert.alert("Saldo Insuficiente", `Solo tienes ${stats.totalQuantity} acciones.`);
         return;
@@ -98,7 +108,14 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <PortfolioContext.Provider value={{ assets, loading, addTransaction, refreshData: fetchPortfolio }}>
+    <PortfolioContext.Provider value={{
+      assets,
+      availableAssets,
+      loading,
+      exchangeRate,
+      addTransaction,
+      refreshData: fetchPortfolio
+    }}>
       {children}
     </PortfolioContext.Provider>
   );
